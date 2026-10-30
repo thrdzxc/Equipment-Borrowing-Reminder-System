@@ -1,0 +1,112 @@
+﻿php : PHP Warning:  Module "openssl" is already loaded in Unknown on line 0
+At line:1 char:1
++ php .\vendor\phpunit\phpunit\phpunit --testdox 2>&1 | Out-File -FileP ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (PHP Warning:  M...known on line 0:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+Warning: Module "openssl" is already loaded in Unknown on line 0
+PHPUnit 11.5.57 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.2.12
+Configuration: D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\phpunit.xml
+
+EEEEEE                                                              6 / 6 (100%)
+
+Time: 00:00.170, Memory: 26.00 MB
+
+Week13Workflow (Tests\Feature\Week13Workflow)
+ Γ£ÿ Unauthorized requests are denied
+   Γöé
+   Γöé Error: Class "Mockery" not found
+   Γöé
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:550
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:448
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:675
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithConsole.php:87
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:119
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:84
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:25
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithTestCaseLifecycle.php:217
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithTestCaseLifecycle.php:101
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\TestCase.php:63
+   Γöé
+ Γ£ÿ Validation rejects blank equipment
+   Γöé
+   Γöé Error: Class "Mockery" not found
+   Γöé
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:550
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:448
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:675
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithConsole.php:87
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:119
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:84
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:25
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithTestCaseLifecycle.php:217
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithTestCaseLifecycle.php:101
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\TestCase.php:63
+   Γöé
+ Γ£ÿ Successful loan and return restores stock
+   Γöé
+   Γöé Error: Class "Mockery" not found
+   Γöé
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:550
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:448
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:675
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithConsole.php:87
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:119
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:84
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:25
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithTestCaseLifecycle.php:217
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithTestCaseLifecycle.php:101
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\TestCase.php:63
+   Γöé
+ Γ£ÿ Transient failure recovers with one retry
+   Γöé
+   Γöé Error: Class "Mockery" not found
+   Γöé
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:550
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:448
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:675
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithConsole.php:87
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:119
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:84
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:25
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithTestCaseLifecycle.php:217
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithTestCaseLifecycle.php:101
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\TestCase.php:63
+   Γöé
+ Γ£ÿ Permanent failure routes to review
+   Γöé
+   Γöé Error: Class "Mockery" not found
+   Γöé
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:550
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:448
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:675
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithConsole.php:87
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:119
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:84
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:25
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithTestCaseLifecycle.php:217
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithTestCaseLifecycle.php:101
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\TestCase.php:63
+   Γöé
+ Γ£ÿ Duplicate asset tag and invalid due date fail
+   Γöé
+   Γöé Error: Class "Mockery" not found
+   Γöé
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:550
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:448
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Testing\PendingCommand.php:675
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithConsole.php:87
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:119
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:84
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\RefreshDatabase.php:25
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithTestCaseLifecycle.php:217
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\InteractsWithTestCaseLifecycle.php:101
+   Γöé D:\Downloads\Equipment_Borrowing_Reminder_System\Equipment_Borrowing_Reminder_System_Week13\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\TestCase.php:63
+   Γöé
+
+ERRORS!
+Tests: 6, Assertions: 0, Errors: 6.

@@ -1,0 +1,16 @@
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+**/.env
+**/.env.*
+!**/.env.example
+**/vendor/
+**/build/
+**/.dart_tool/
+**/.phpunit.cache/
+**/*.log
+**/database.sqlite
+docs/_qa_pages/
+docs/_qa_contact_sheet.jpg
+docs/_qa_report/
