@@ -14,3 +14,14 @@ Thumbs.db
 docs/_qa_pages/
 docs/_qa_contact_sheet.jpg
 docs/_qa_report/
+# PHPUnit generated files
+**/.phpunit.result.cache
+
+# Laravel runtime files
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+backend/storage/framework/cache/*
+backend/storage/logs/*
+
+# Temporary backups
+**/*.backup

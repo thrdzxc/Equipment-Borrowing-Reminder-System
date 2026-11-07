@@ -1,0 +1,13 @@
+PASS Bounded maximum of 10 loans per run
+PASS Maximum three reminder attempts
+PASS Success outcome
+PASS Transient attempt 1 fails
+PASS Transient outcome eligible for retry
+PASS Transient attempt 2 recovers
+PASS Permanent failure never automatically retries
+PASS Transient retry stops after maximum attempts
+PASS Borrowing due tomorrow is eligible
+PASS Borrowing more than 48h away is not eligible
+PASS Old overdue borrowing is outside bounded window
+All isolated policy checks passed. Full Laravel/Flutter integration remains untested here.
+Exit code: 0

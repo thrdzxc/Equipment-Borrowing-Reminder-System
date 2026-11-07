@@ -1,0 +1,7 @@
+Week 14 packaging audit (actual)
+No original .env, SQLite database, private key, .git history, compiled Flutter build or vendor dependency tree copied.
+Forbidden path count: 0
+PHP lint: 33 source files PASS (see php_lint_actual.txt).
+Isolated reminder policy smoke: 11 checks PASS (see policy_smoke_actual.txt).
+Laravel API/Flutter tests: NOT RUN in package environment (no PDO SQLite extension / no Flutter SDK).
+Hosted HTTPS: NOT DEPLOYED or verified.

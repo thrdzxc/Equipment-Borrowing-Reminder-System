@@ -15,7 +15,7 @@ class ReminderRunner {
  public const LIMIT=ReminderPolicy::MAX_ITEMS;
  public const MAX_ATTEMPTS=ReminderPolicy::MAX_ATTEMPTS;
  public function run(string $mode='success'):array {
-  if(!app()->environment(['local','testing'])){$mode='success';}
+  if(!app()->environment('local','testing')){$mode='success';}
   if(!in_array($mode,['success','transient_once','transient_always','permanent_failure'],true)){
    throw new \InvalidArgumentException('Unknown local simulation mode');
   }

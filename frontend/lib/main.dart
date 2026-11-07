@@ -291,6 +291,25 @@ class _AppRootState extends State<AppRoot> {
   int page = 0;
   int refresh = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    api.onUnauthorized = () {
+      if (!mounted) return;
+      setState(() {
+        loggedIn = false;
+        page = 0;
+      });
+      notify('Session expired. Please sign in again.', error: true);
+    };
+  }
+
+  @override
+  void dispose() {
+    api.client.close();
+    super.dispose();
+  }
+
   final labels = const [
     'Overview',
     'Equipment',
@@ -396,14 +415,20 @@ class _AppRootState extends State<AppRoot> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final desktop = constraints.maxWidth >= 980;
+        // Navigation is a convenience only; the Laravel API enforces the roles.
+        final visiblePages = api.canManageAutomation
+            ? <int>[0, 1, 2, 3, 4]
+            : api.canManageBorrowings
+                ? <int>[0, 1, 2, 4]
+                : <int>[0, 1, 4];
 
         Widget sidebar() {
           return SidebarMenu(
-            labels: labels,
-            icons: icons,
-            selected: page,
+            labels: visiblePages.map((i) => labels[i]).toList(),
+            icons: visiblePages.map((i) => icons[i]).toList(),
+            selected: visiblePages.indexOf(page),
             collapsed: desktop && collapsed,
-            onSelect: (index) => navigate(index, !desktop),
+            onSelect: (index) => navigate(visiblePages[index], !desktop),
             onToggle: () => setState(() => collapsed = !collapsed),
             onLogout: logout,
           );
@@ -1187,7 +1212,8 @@ class EquipmentScreen extends StatelessWidget {
           'Equipment inventory',
           'Register and monitor available equipment.',
         ),
-        Align(
+        if (api.canManageInventory)
+          Align(
           alignment: Alignment.centerRight,
           child: FilledButton.icon(
             onPressed: () => addEquipment(context),
@@ -1464,7 +1490,8 @@ class BorrowingsScreen extends StatelessWidget {
           'Borrowing records',
           'Issue, return, and monitor equipment borrowings.',
         ),
-        Align(
+        if (api.canManageBorrowings)
+          Align(
           alignment: Alignment.centerRight,
           child: FilledButton.icon(
             onPressed: () => createBorrowing(context),
@@ -1529,7 +1556,7 @@ class BorrowingsScreen extends StatelessWidget {
                               'Reminder: ${item['reminder_status']}',
                             ),
                           ),
-                          if (item['status'] == 'active')
+                          if (api.canManageBorrowings && item['status'] == 'active')
                             OutlinedButton(
                               onPressed: () => performAction(
                                 item['id'] as int,
@@ -1538,7 +1565,7 @@ class BorrowingsScreen extends StatelessWidget {
                               ),
                               child: const Text('Mark returned'),
                             ),
-                          if (item['status'] == 'active' &&
+                          if (api.canManageAutomation && item['status'] == 'active' &&
                               item['reminder_status'] == 'needs_review')
                             OutlinedButton(
                               onPressed: () => performAction(

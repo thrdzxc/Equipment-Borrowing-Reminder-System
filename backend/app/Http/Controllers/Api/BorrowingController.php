@@ -7,11 +7,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 class BorrowingController extends Controller {
- public function index(){ return Borrowing::with('equipment:id,name,asset_tag')->orderByDesc('id')->limit(100)->get(); }
+ public function index(){
+  return Borrowing::select('id','equipment_id','borrower_name','borrowed_at','due_at','returned_at','status','reminder_status','reminder_attempts','last_error_code')
+   ->with('equipment:id,name,asset_tag')->orderByDesc('id')->limit(100)->get();
+ }
  public function store(Request $request){
   $data=$request->validate([
    'equipment_id'=>['required','integer','exists:equipment,id'],
-   'borrower_name'=>['required','string','max:100'],
+   'borrower_name'=>['required','string','min:2','max:100','not_regex:/[\x00-\x1F\x7F]/'],
    'due_at'=>['required','date','after:now'],
   ]);
   $loan=DB::transaction(function () use ($data) {

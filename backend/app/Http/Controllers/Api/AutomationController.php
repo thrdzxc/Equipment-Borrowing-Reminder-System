@@ -16,10 +16,13 @@ class AutomationController extends Controller {
    'needs_review'=>Borrowing::where('reminder_status','needs_review')->where('status','active')->count(),
    'delivery'=>'simulated_only',
  ]);}
- public function events(){return AutomationEvent::orderByDesc('id')->limit(100)->get();}
+ public function events(){
+  return AutomationEvent::select('id','run_id','borrowing_id','event_type','attempt','result_code','created_at')
+    ->orderByDesc('id')->limit(100)->get();
+ }
  public function run(Request $request,ReminderRunner $runner){
   $data=$request->validate(['mode'=>['nullable',Rule::in(['success','transient_once','transient_always','permanent_failure'])]]);
-  if(!app()->environment(['local','testing']) && array_key_exists('mode',$data)){
+  if(!app()->environment('local','testing') && array_key_exists('mode',$data)){
    return response()->json(['message'=>'Simulation mode override is local-only'],403);
   }
   $result=$runner->run($data['mode']??'success');
