@@ -9,8 +9,7 @@ class ApiException implements Exception {
   String toString() => message;
 }
 
-/// Bearer token lives only in memory. Do NOT write it to localStorage,
-/// SharedPreferences, URLs, logs or compiled Dart defines.
+/// Tokens remain in memory only, never stored in browser storage or logs.
 class ApiClient {
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL', defaultValue: 'http://127.0.0.1:8000/api');
@@ -28,8 +27,6 @@ class ApiClient {
 
   Future<dynamic> call(String method, String path, [Map<String, dynamic>? data]) async {
     final uri = Uri.parse('$baseUrl$path');
-    // Never allow an HTTPS Flutter page to submit a bearer token over plaintext.
-    // HTTP is permitted ONLY for the localhost development demonstration.
     if (Uri.base.scheme == 'https' && uri.scheme != 'https') {
       throw const ApiException('Secure page requires an HTTPS API endpoint.', 0);
     }
@@ -52,7 +49,6 @@ class ApiClient {
     } on ApiException {
       rethrow;
     } catch (_) {
-      // Never expose exception payloads or bearer tokens in UI errors.
       throw const ApiException('Cannot reach the Laravel API. Check the server, URL and CORS settings.', 0);
     }
 
@@ -67,6 +63,10 @@ class ApiClient {
         token = null;
         role = null;
         onUnauthorized?.call();
+      }
+      // W15-H02: do not render backend exception details or HTML in UI for 5xx.
+      if (response.statusCode >= 500) {
+        throw ApiException('The server encountered a problem. Please try again later.', response.statusCode);
       }
       var message = decoded is Map
           ? '${decoded['message'] ?? 'API request failed'}'
