@@ -1,0 +1,2 @@
+workload,clients,duration_seconds,requests,success,errors,error_percent,requests_per_second,average_ms,median_ms,p95_ms
+peak,20,31.8,324,324,0,0.0,10.19,1403.94,1412.94,1549.7
