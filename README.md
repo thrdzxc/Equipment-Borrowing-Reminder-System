@@ -1,121 +1,182 @@
-# Equipment Borrowing Reminder System — Week 13
+# EQUIPTRACK — Equipment Borrowing Reminder System
 
-**Author:** Sales, Samuel Jr. C. | **Section:** BSIT 3 - B  
+**Student:** Sales, Samuel Jr. C.  
+**Section:** BSIT 3-B  
+**Institution:** University of La Salette  
 **Course:** Integrative Programming and Technologies 2 / IT Free Elective 2  
-**Week 13:** Advanced Automation and Scripting (October 26–30, 2026)
+**Repository:** https://github.com/thrdzxc/Equipment-Borrowing-Reminder-System  
+**Project:** Project 5, Weeks 13–18 (Flutter Web + Laravel REST API)
 
-## Project overview
+## Overview
 
-A Week 13 classroom proof-of-concept in **Flutter Web + Laravel REST API + SQLite**. Staff operators register inventory, issue equipment loans, and manually trigger due-soon reminder simulation.
+EQUIPTRACK is a classroom prototype for laboratory equipment inventory, borrowing, returns, due-date tracking and *simulated* reminder automation. The primary intended roles are **student**, **laboratory staff**, and **equipment custodian**. It is not a production notification platform; no real email or SMS messages are sent.
 
-**UI update (v1.2 white edition):** The Flutter Web client uses a formal white/blue glass interface with frosted panels, clear contrast, an icon-only collapsible sidebar, and a mobile drawer. The four promotional labels were removed. The supplied ULS logo and campus images remain as subtle branded assets. This revised source requires a fresh local Flutter build.
+**Implemented and demonstrated:** authenticated login/logout, role-restricted inventory and borrowing functions, loan creation/returns with stock updates, health checks, dashboard aggregates, simulated reminder runs with bounded retries and human-review routing, structured automation events, and responsive Flutter Web screens.
 
-**Automation scope:** The backend processes up to 10 eligible loans per run, attempts at most 3 simulated notifications per loan, retries transient errors with bounded backoff, routes permanent errors to human review, and records structured events. **No actual email or SMS is sent.**
+**Scope distinction:** The Project 5 reference describes a broader request → approval → release → due-date tracking → return → inspection → closure lifecycle. Standalone approval, inspection, and closure stages have **not been verified** in this build; do not represent them as implemented or UAT-accepted without additional code and testing.
 
-## Important verification status
+## Architecture
 
-Source code is provided. PHP files have been syntax-checked and 11 isolated reminder-policy checks passed, but Composer, Flutter and their dependencies were unavailable in the artifact-authoring environment; therefore the complete application was **not executed end-to-end there**. See `docs/EVIDENCE_INDEX.md` and `docs/ISSUES_AND_LIMITATIONS.md`. The newly revised white UI has not been independently compiled here. The earlier user-provided Chrome screenshot shows an API connectivity error in the old UI and is not proof that the new UI or backend works.
+```text
+Chrome / Flutter Web (port 3000)
+    | JSON REST requests; Sanctum bearer token held in memory
+    v
+Laravel API (port 8000)
+    | Authentication, role checks, validation, transactions,
+    | reminder simulation, structured event logs
+    v
+SQLite (backend/database/database.sqlite)
+```
 
-**Start here:** `RUN_WINDOWS_AND_PHONE.md` includes corrected Android Studio/Windows steps, API setup, and phone browser instructions. `docs/Week13_Submissions_0_to_6/` maps this project to the seven Drive reference categories without copying another student's evidence.
+The local development server uses **HTTP loopback only**. Any actual deployment must use trusted HTTPS/TLS and deployment-specific security configuration. SQLite is suitable for the bounded local prototype; production concurrency, backups, recovery and access controls require separate evaluation.
+
+Architecture evaluation: `docs/week17/` supporting documents and evidence, as available in the submission package.
+
+## Role and API scope
+
+| Role | Supported API permissions |
+|---|---|
+| Student | Authenticated dashboard and equipment list (minimized fields) |
+| Staff | Dashboard, equipment list, borrowing list/create/return |
+| Custodian | Staff capabilities plus equipment creation, reminder reset, automation run and events |
+
+The backend is authoritative for permissions; Flutter only adjusts visible UI controls.
+
+### Implemented routes (relative to `/api`)
+
+| Method | Route | Access |
+|---|---|---|
+| GET | `/health` | Public |
+| POST | `/auth/login` | Public, rate-limited |
+| POST | `/auth/logout` | Authenticated |
+| GET | `/dashboard` | Authenticated |
+| GET | `/equipment` | Authenticated |
+| POST | `/equipment` | Custodian |
+| GET | `/borrowings` | Staff or custodian |
+| POST | `/borrowings` | Staff or custodian |
+| POST | `/borrowings/{borrowing}/return` | Staff or custodian |
+| POST | `/borrowings/{borrowing}/reset-reminder` | Custodian |
+| GET | `/automation/events` | Custodian |
+| POST | `/automation/run` | Custodian, rate-limited |
+
+Detailed request, response, validation and error contracts: **`docs/week17/openapi.yaml`**. The OpenAPI file describes the locally implemented API; it is not proof of production readiness.
 
 ## Requirements
 
-- Windows 11 with **PHP >=8.2**, **Composer**, `php.ini` extensions `pdo_sqlite`, `sqlite3`, `mbstring`, `fileinfo`, `openssl`, and `curl` as required by installed Laravel dependencies.
-- **Flutter stable**, Chrome, and Git. Flutter 3.24+ with Dart 3.5+ is suitable for the supplied Dart syntax; use the installed stable SDK.
-- Internet to run `composer install` and `flutter pub get` initially.
-- Local ports **8000** (API) and **3000** (Flutter) must be available.
+- Windows 11, PowerShell, Chrome and Git.
+- PHP 8.2+ and Composer, with extensions required by Laravel and SQLite (including `pdo_sqlite` and `sqlite3`).
+- Flutter stable SDK supporting the project's `frontend/pubspec.yaml` Dart constraints.
+- Ports **8000** and **3000** available.
+- Test-only credentials chosen locally, not shared in code or screenshots.
 
-## Step 1 — Laravel backend (PowerShell, terminal 1)
+## Local setup — backend
+
+From the **repository root** in PowerShell:
 
 ```powershell
 cd backend
 composer install
 Copy-Item .env.example .env
-# Open .env and replace DEMO_ADMIN_PASSWORD=CHANGE_ME_LOCALLY
-# with your own private, random password of at least 12 characters.
-# Never push .env to GitHub.
+# Edit .env locally: set a strong DEMO_ADMIN_PASSWORD and other test-only secrets.
+# Never commit .env, plaintext tokens or database files.
 php artisan key:generate
-New-Item -ItemType File -Path database/database.sqlite -Force
+if (!(Test-Path .\database\database.sqlite)) { New-Item -ItemType File .\database\database.sqlite | Out-Null }
 php artisan migrate --seed
 php artisan serve --host=127.0.0.1 --port=8000
 ```
 
-Open `http://127.0.0.1:8000/api/health` and confirm `status: ok`. If migrations say the SQLite driver is missing, enable the `pdo_sqlite` and `sqlite3` extensions in your active `php.ini`, restart the terminal and try again.
+If `.env` or the SQLite file already exists and contains your test data, **do not overwrite it or re-run seed/migration operations blindly**. First inspect the current configuration and back up data. `backend/.env.example` contains safe placeholders, including `FRONTEND_ORIGIN=http://localhost:3000`, `TOKEN_TTL_MINUTES=60`, and `SECURE_REQUIRE_HTTPS=false` for loopback development. HTTPS enforcement requires the correct trusted production proxy/TLS setup.
 
-## Step 2 — Flutter Web (PowerShell, terminal 2)
+Health endpoint: `http://127.0.0.1:8000/api/health`. A healthy local response contains `status: ok`, `service: equipment-reminder-api`, and `delivery: simulation-only`.
+
+## Local setup — frontend
+
+In **a second PowerShell terminal**, from the repository root:
 
 ```powershell
 cd frontend
-flutter create . --platforms web
 flutter pub get
 flutter run -d chrome --web-port 3000 --dart-define=API_BASE_URL=http://127.0.0.1:8000/api
 ```
 
-If `flutter create` asks about rewriting files, preserve the supplied `lib/`, `test/` and `pubspec.yaml` files. The first command fills in platform scaffolding absent from a source-only project. Sign in using the `DEMO_ADMIN_EMAIL` and private `DEMO_ADMIN_PASSWORD` set in the local backend `.env`.
+Open `http://localhost:3000`. Use the fictional/local test account configured in your backend. The API bearer token is held in memory and cleared on logout or an authenticated 401 response. Do not use actual student personal data for demonstrations.
 
-## Step 3 — Demonstrate the Week 13 workflow
+If initial Flutter Web platform scaffolding is genuinely absent from a fresh source-only checkout, consult `RUN_WINDOWS_AND_PHONE.md` before creating platform files. Do not overwrite existing `frontend/lib`, `frontend/test`, or `pubspec.yaml`.
 
-1. Open **Equipment** → **Add equipment**. Use a unique asset tag, equipment name, category, and positive quantity.
-2. Open **Borrowings** → **New borrowing**. Choose equipment, type a controlled `Demo User` name, and set a due date **within 48 hours**.
-3. Open **Automation** → **Normal success** → **Run automation**. Check that a `reminder_completed` event appears.
-4. Create another loan due soon. Select **Transient failure → retry → success**; run and verify attempt 1 failure, `retry_scheduled`, attempt 2 success.
-5. Create a third loan due soon. Select **Permanent failure**; verify `needs_review` and `routed_for_review` event. In Borrowings, use **Reset reminder** only after review.
-6. Use **Mark returned** to restore availability. Use **Log out** to revoke the current token.
+## Supported demonstration workflow
 
-A completed reminder is not retried in a subsequent run. To demonstrate each outcome, use separate new pending loans.
+1. Log in with an authorized custodian account.
+2. Open **Equipment** to review inventory; custodian may add an item with a unique asset tag and positive quantity.
+3. Open **Borrowings** and create a controlled loan with a fictional borrower and a valid future due date. Confirm one available unit is deducted.
+4. Open **Automation** to run the supported simulation, using an eligible test loan. Review structured events. Modes supported by the API in local/testing environments include `success`, `transient_once`, `transient_always` and `permanent_failure`. An automation run with zero eligible loans demonstrates run completion, **not delivered reminders**.
+5. If a loan is routed to `needs_review`, a custodian can reset it when allowed.
+6. Mark a loan returned and verify stock restoration. Log out and confirm protected actions require authentication.
 
-## Step 4 — Actual test commands
+Reminder mode override is **local/testing only** and must not be treated as an unrestricted production feature.
 
-The isolated policy smoke test (which does not exercise Laravel HTTP or Flutter) can be rerun even without Composer:
+## Validation and tests
 
-```powershell
-php backend/tests/Smoke/ReminderPolicySmoke.php
-```
-
-
+From `backend`:
 
 ```powershell
-# Terminal within backend (Laravel dependencies installed):
+php .\vendor\phpunit\phpunit\phpunit --testdox
+# Or, if available in the installation:
 php artisan test
-# Terminal within frontend (Flutter dependencies installed):
-flutter test
 ```
 
-Also perform and record manual scenarios from `docs/WEEK13_TEST_PLAN.md`. Capture **real screenshots** and **real event logs**. The project intentionally does not include invented runtime evidence.
-
-## Folders
-
-```text
-backend/     Laravel API source, models, controllers, service, migrations, seeder, PHPUnit tests
-frontend/    Flutter Web UI source and widget test
-docs/        Design, User Manual, evidence index, test plan, screenshots and contribution note
-```
-
-## GitHub and submission
-
-Create a new GitHub repository (or select your instructor-approved repository), then place this project's files at its root. **At minimum include `README.md`, `backend/`, `frontend/`, `docs/USER_MANUAL.md`, `docs/User_Manual.docx`, and manual screenshot files.** Keep `.env`, `vendor/`, compiled files, live tokens and private data out of Git. Make a real commit and record its exact hash in `docs/EVIDENCE_INDEX.md`.
-
-Suggested commands from the project root after reviewing files:
+From `frontend`:
 
 ```powershell
-git init
-git add .
-git commit -m "Week 13 equipment reminder workflow and user manual"
-git branch -M main
-git remote add origin https://github.com/YOUR_ACCOUNT/YOUR_REPO.git
-git push -u origin main
+flutter analyze
+flutter test --reporter expanded
 ```
 
-The remote URL above is a placeholder, not an existing project repository. **No GitHub push has been performed here**, because no target repository was specified or accessible. The course guide requires a verifiable repository commit/tag and evidence index.
+Record the **actual** current test counts, errors and test date; do not carry forward older pass counts without rerunning. Week 13–16 reports contain historical automation, security, hardening, performance and recovery evidence. The health-endpoint load measurements from Week 16 are local prototype observations, not production capacity benchmarks.
 
-## Acknowledgements and responsible use
+## Week 17 — UAT and documentation
 
-Flutter, Dart, Laravel, Sanctum, SQLite, PHPUnit, and the relevant open-source libraries are used according to their respective licenses. This starter implementation and associated documentation were prepared with AI assistance, which must be acknowledged according to instructor policy. Verify, understand, secure, test, and defend every component personally before submission.
+- UAT Plan: `Week17_UAT_Plan_Sales_Samuel_Jr_C.docx` (in Week 17 submission evidence folder).
+- UAT Results Template: `Week17_UAT_Results_Sales_Samuel_Jr_C.docx` (initially **NOT TESTED**).
+- Architecture evaluation and diagrams: Week 17 submission evidence folder.
+- OpenAPI contract: `docs/week17/openapi.yaml`.
+- Screenshots: Week 17 evidence folder, indexed by evidence ID.
 
-## Formal white UI revision and evidence
+**UAT approval remains a separate prerequisite.** Preliminary developer checks are not equivalent to an instructor-approved UAT session with actual participant feedback. Record expected and actual outcomes, findings, dispositions and retests; do not fabricate a signature, comment or PASS result.
 
-- The old dark-theme browser screenshot was supplied by the student and preserved under `docs/Week13_Submissions_0_to_6/04_Flutter_Screens/` as a **before-redesign API-unreachable capture**.
-- Do not reuse the other student's Google Drive screenshots or submit reference illustrations as your own.
-- User Manual screenshot slots are explicitly pending genuine screenshots taken after compiling and running the new build.
-- Screenshots needed: login, desktop overview, collapsed sidebar, mobile navigation, equipment/add form, borrowing form, success/retry/permanent automation, return, and narrow-width validation.
-- No GitHub upload or Google Drive submission was performed.
+## Known limitations and maintenance
+
+- **Simulated reminders only**: no real outbound delivery or external SMS/email integration.
+- **Local development environment**: no production deployment validation or trusted public HTTPS endpoint demonstrated by the described local tests.
+- **Lifecycle scope gap**: standalone approval, inspection and formal closure were not verified.
+- **SQLite and backups**: suitable for controlled local testing; define backup, restore and concurrency requirements before real multi-user deployment.
+- **Security and data minimization**: use fictional records; protect `.env`, tokens, credentials and private data. Review role checks and token expiry in regression testing.
+- **Maintenance routine**: rerun backend/frontend tests after changes, check framework dependencies, monitor health/logs, verify backup restoration, update the OpenAPI contract and README when routes change, and keep known issues traceable.
+
+**Readiness:** A classroom prototype for controlled UAT and defense, **not production-approved**. Final recommendation remains conditional on authorized UAT, documented findings and the instructor's evaluation.
+
+## Repository and evidence integrity
+
+Work in the **existing** repository; do **not** run `git init` or add a second `origin`.
+
+```powershell
+# From repository root
+ git status --short
+ git diff --check
+ git add README.md docs/week17/openapi.yaml
+ git diff --cached --check
+ git diff --cached --stat
+# After reviewing exactly what is staged:
+ git commit -m "Week 17: Add OpenAPI and update project README"
+ git push origin main
+```
+
+Before committing, ensure `.env`, private keys, tokens, real data, generated SQLite databases, and unnecessary JSON exports are not staged. Keep evidence aligned to the actual commit hash. Do not claim GitHub push success until the remote accepts the commit.
+
+## Files and acknowledgements
+
+- `backend/`: Laravel routes/controllers, models, validation, reminder runner, migrations, tests.
+- `frontend/`: Flutter Web interface, API client and widget/security tests.
+- `docs/`: Guides, test plans, evidence references and `docs/week17/openapi.yaml`.
+- `RUN_WINDOWS_AND_PHONE.md`: Original local development guide.
+
+This project uses Flutter, Dart, Laravel, Sanctum, SQLite, PHPUnit and open-source dependencies. AI assistance in documentation and development should be disclosed according to instructor policy. The author remains responsible for validating claims and understanding the work.

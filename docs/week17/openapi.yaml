@@ -1,0 +1,640 @@
+openapi: 3.0.3
+info:
+  title: EQUIPTRACK — Equipment Borrowing Reminder API
+  version: 1.0.0
+  description: Week 17 OpenAPI contract based on the Laravel route export and controller source for the classroom
+    Flutter Web prototype. Reminders are simulated, not sent as real messages. HTTP endpoint is for local development;
+    use trusted HTTPS for real deployment.
+servers:
+- url: http://127.0.0.1:8000/api
+  description: Local development only (not production HTTPS)
+tags:
+- name: Health
+- name: Authentication
+- name: Dashboard
+- name: Equipment
+- name: Borrowings
+- name: Automation
+paths:
+  /health:
+    get:
+      tags:
+      - Health
+      summary: Return API health and simulated delivery marker
+      operationId: get__health
+      responses:
+        '200':
+          description: Successful result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  service:
+                    type: string
+                    example: equipment-reminder-api
+                  delivery:
+                    type: string
+                    example: simulation-only
+                required:
+                - status
+                - service
+                - delivery
+  /auth/login:
+    post:
+      tags:
+      - Authentication
+      summary: Authenticate and obtain expiring Sanctum bearer token
+      operationId: post__auth_login
+      description: 'Rate limit: 5 requests per minute.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Successful result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '422':
+          description: Laravel validation rejected input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/logout:
+    post:
+      tags:
+      - Authentication
+      summary: Revoke the active bearer token
+      operationId: post__auth_logout
+      security:
+      - sanctumBearer: []
+      description: 'Required role: authenticated.'
+      responses:
+        '200':
+          description: Successful result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logged out
+        '401':
+          description: Unauthenticated; invalid or expired bearer token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /dashboard:
+    get:
+      tags:
+      - Dashboard
+      summary: Return dashboard aggregates
+      operationId: get__dashboard
+      security:
+      - sanctumBearer: []
+      description: 'Required role: authenticated.'
+      responses:
+        '200':
+          description: Successful result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+        '401':
+          description: Unauthenticated; invalid or expired bearer token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /equipment:
+    get:
+      tags:
+      - Equipment
+      summary: List equipment availability, with minimized fields
+      operationId: get__equipment
+      security:
+      - sanctumBearer: []
+      description: 'Required role: authenticated.'
+      responses:
+        '200':
+          description: Successful result
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Equipment'
+        '401':
+          description: Unauthenticated; invalid or expired bearer token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+      - Equipment
+      summary: Create an equipment record
+      operationId: post__equipment
+      security:
+      - sanctumBearer: []
+      description: 'Required role: custodian.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EquipmentCreate'
+      responses:
+        '201':
+          description: Successful result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Equipment'
+        '401':
+          description: Unauthenticated; invalid or expired bearer token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Authenticated but role is not allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Laravel validation rejected input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /borrowings:
+    get:
+      tags:
+      - Borrowings
+      summary: List up to 100 newest borrowing records
+      operationId: get__borrowings
+      description: 'Includes borrower names; not available to student role. Required role: staff or custodian.'
+      security:
+      - sanctumBearer: []
+      responses:
+        '200':
+          description: Successful result
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Borrowing'
+        '401':
+          description: Unauthenticated; invalid or expired bearer token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Authenticated but role is not allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+      - Borrowings
+      summary: Issue one unit of equipment and decrement available stock
+      operationId: post__borrowings
+      description: 'Atomic stock update; rejects a request when no equipment is available. Required role: staff
+        or custodian.'
+      security:
+      - sanctumBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BorrowingCreate'
+      responses:
+        '201':
+          description: Successful result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Borrowing'
+        '401':
+          description: Unauthenticated; invalid or expired bearer token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Authenticated but role is not allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Laravel validation rejected input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /borrowings/{borrowing}/return:
+    post:
+      tags:
+      - Borrowings
+      summary: Return a loan and restore stock once
+      operationId: post__borrowings__borrowing__return
+      security:
+      - sanctumBearer: []
+      description: 'Required role: staff or custodian.'
+      parameters:
+      - name: borrowing
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+        description: Existing borrowing ID (Laravel model binding)
+      responses:
+        '200':
+          description: Successful result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Borrowing'
+        '401':
+          description: Unauthenticated; invalid or expired bearer token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Authenticated but role is not allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Borrowing ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Borrowing already returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /borrowings/{borrowing}/reset-reminder:
+    post:
+      tags:
+      - Borrowings
+      summary: Reset manual-review reminder to pending
+      operationId: post__borrowings__borrowing__reset_reminder
+      security:
+      - sanctumBearer: []
+      description: 'Required role: custodian.'
+      parameters:
+      - name: borrowing
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+        description: Existing borrowing ID (Laravel model binding)
+      responses:
+        '200':
+          description: Successful result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Borrowing'
+        '401':
+          description: Unauthenticated; invalid or expired bearer token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Authenticated but role is not allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Borrowing ID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Loan is not active or does not need review
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /automation/events:
+    get:
+      tags:
+      - Automation
+      summary: List up to 100 newest structured automation events
+      operationId: get__automation_events
+      security:
+      - sanctumBearer: []
+      description: 'Required role: custodian.'
+      responses:
+        '200':
+          description: Successful result
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AutomationEvent'
+        '401':
+          description: Unauthenticated; invalid or expired bearer token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Authenticated but role is not allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /automation/run:
+    post:
+      tags:
+      - Automation
+      summary: Execute simulated reminder processing
+      operationId: post__automation_run
+      security:
+      - sanctumBearer: []
+      description: 'Required role: custodian. Rate limit: 10 requests per minute.'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutomationRunRequest'
+      responses:
+        '200':
+          description: Successful result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationRunResult'
+        '401':
+          description: Unauthenticated; invalid or expired bearer token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Role denied or explicit simulation override is not allowed outside local/testing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Laravel validation rejected input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '409':
+          description: Reminder runner is busy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationRunResult'
+components:
+  securitySchemes:
+    sanctumBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: Sanctum token
+      description: 'Token returned by POST /auth/login; send Authorization: Bearer <token>. Do not commit real
+        tokens.'
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+    ValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+    Equipment:
+      type: object
+      properties:
+        id:
+          type: integer
+        asset_tag:
+          type: string
+        name:
+          type: string
+        category:
+          type: string
+        quantity_total:
+          type: integer
+        quantity_available:
+          type: integer
+    EquipmentCreate:
+      type: object
+      properties:
+        asset_tag:
+          type: string
+          maxLength: 40
+          description: Letters, numbers, dashes and underscores; unique among equipment.
+        name:
+          type: string
+          maxLength: 100
+        category:
+          type: string
+          maxLength: 70
+        quantity_total:
+          type: integer
+          minimum: 1
+          maximum: 1000
+      required:
+      - asset_tag
+      - name
+      - category
+      - quantity_total
+    EquipmentSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        asset_tag:
+          type: string
+    Borrowing:
+      type: object
+      properties:
+        id:
+          type: integer
+        equipment_id:
+          type: integer
+        borrower_name:
+          type: string
+        borrowed_at:
+          type: string
+          format: date-time
+        due_at:
+          type: string
+          format: date-time
+        returned_at:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+        reminder_status:
+          type: string
+        reminder_attempts:
+          type: integer
+        last_error_code:
+          type: string
+          nullable: true
+        equipment:
+          $ref: '#/components/schemas/EquipmentSummary'
+    BorrowingCreate:
+      type: object
+      properties:
+        equipment_id:
+          type: integer
+          description: Existing equipment ID with available stock
+        borrower_name:
+          type: string
+          minLength: 2
+          maxLength: 100
+          description: No control characters
+        due_at:
+          type: string
+          format: date-time
+          description: Must be later than server current time
+      required:
+      - equipment_id
+      - borrower_name
+      - due_at
+    Dashboard:
+      type: object
+      properties:
+        equipment_types:
+          type: integer
+        available_units:
+          type: integer
+        active_borrowings:
+          type: integer
+        due_soon:
+          type: integer
+        needs_review:
+          type: integer
+        delivery:
+          type: string
+          example: simulated_only
+    AutomationEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+        run_id:
+          type: string
+        borrowing_id:
+          type: integer
+          nullable: true
+        event_type:
+          type: string
+        attempt:
+          type: integer
+        result_code:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    AutomationRunRequest:
+      type: object
+      properties:
+        mode:
+          type: string
+          enum:
+          - success
+          - transient_once
+          - transient_always
+          - permanent_failure
+          description: Optional simulation override. Explicit mode accepted only in local/testing environments.
+    AutomationRunResult:
+      type: object
+      description: Result returned by ReminderRunner::run; exact keys depend on run outcome. HTTP 409 when
+        result.status is busy.
+      additionalProperties: true
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          type: string
+          maxLength: 256
+          format: password
+      required:
+      - email
+      - password
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Sensitive plaintext token; never include in screenshots
+        user:
+          type: object
+          properties:
+            name:
+              type: string
+            role:
+              type: string
+              enum:
+              - student
+              - staff
+              - custodian
+        expires_in_minutes:
+          type: integer
+          minimum: 5
+          maximum: 120
+      required:
+      - token
+      - user
+      - expires_in_minutes
